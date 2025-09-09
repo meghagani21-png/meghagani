@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Neon Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0b10;
+    --card:#10131cdd;
+    --ring: #6ee7ff;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji";
+    background: var(--bg);
+    color:#e8eefc;
+    overflow:hidden;
+  }
+
+  /* ---- full-screen animated neon background ---- */
+  .stage{
+    position:fixed; inset:0; overflow:hidden;
+    background: radial-gradient(1200px 1200px at 80% -10%, #00263f, transparent 55%),
+                radial-gradient(1000px 900px at -10% 110%, #1a002c, transparent 60%),
+                #000;
+  }
+
+  /* colorful “smoke” ribbons */
+  .ribbon{
+    position:absolute; inset:-20%;
+    filter: url(#goo) blur(12px) contrast(115%);
+    mix-blend-mode: screen;
+    opacity:.85;
+    animation: drift 16s linear infinite;
+  }
+  .ribbon:nth-child(2){ animation-duration: 22s; animation-direction: reverse; }
+  .ribbon:nth-child(3){ animation-duration: 28s; }
+
+  .ribbon::before, .ribbon::after{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      conic-gradient(from 120deg at 40% 50%, rgba(0,255,194,.0), rgba(0,255,194,.8), rgba(0,0,0,0) 70%),
+      conic-gradient(from -90deg at 60% 50%, rgba(0,170,255,0), rgba(0,170,255,.9), rgba(0,0,0,0) 65%);
+    filter: blur(30px);
+    transform: translateZ(0);
+  }
+  /* hue shifts to get multiple colors */
+  .ribbon.cyan { filter: url(#goo) blur(12px) contrast(120%) hue-rotate(40deg) saturate(140%); }
+  .ribbon.magenta { filter: url(#goo) blur(12px) contrast(120%) hue-rotate(260deg) saturate(160%); }
+  .ribbon.lime { filter: url(#goo) blur(12px) contrast(120%) hue-rotate(120deg) saturate(160%); }
+
+  @keyframes drift {
+    0%   { transform: translate(-10%, -6%) rotate(0deg) scale(1.05); }
+    25%  { transform: translate(6%, -2%) rotate(30deg) scale(1.08); }
+    50%  { transform: translate(10%, 6%) rotate(60deg) scale(1.03); }
+    75%  { transform: translate(-6%, 2%) rotate(90deg) scale(1.06); }
+    100% { transform: translate(-10%, -6%) rotate(120deg) scale(1.05); }
+  }
+
+  /* ---- center login card ---- */
+  .wrap{
+    position:relative; z-index:2;
+    height:100%; display:grid; place-items:center;
+    padding:24px;
+  }
+  .card{
+    width: min(420px, 92vw);
+    background: var(--card);
+    backdrop-filter: blur(10px) saturate(120%);
+    border: 1px solid #2a3346;
+    border-radius: 22px;
+    box-shadow:
+      0 0 0 1px rgba(110,231,255,.12) inset,
+      0 20px 70px rgba(0,0,0,.45),
+      0 0 120px 20px rgba(255,0,204,.08);
+    padding: 28px 26px 26px;
+  }
+  .title{
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:10px;
+  }
+  .title .dot{
+    width:12px; height:12px; border-radius:50%;
+    background: radial-gradient(circle at 40% 35%, #fff, #0ff 40%, transparent 70%),
+                radial-gradient(circle at 65% 60%, #7df, transparent 60%);
+    box-shadow: 0 0 18px #39d8ff, 0 0 50px #39d8ff88;
+  }
+  h1{
+    font-size: clamp(22px, 3.4vw, 28px);
+    margin:0; font-weight:600; letter-spacing:.3px;
+  }
+  p.sub{
+    margin:0 0 18px; color:#9fb4d8; font-size:14px;
+  }
+  label{
+    font-size:13px; color:#cfe2ff; display:block; margin:14px 0 8px;
+  }
+  input{
+    width:100%; padding:12px 14px;
+    border-radius:14px; border:1px solid #2d3b52;
+    background:#0c111a; color:#eaf3ff;
+    outline:none;
+  }
+  input:focus{
+    border-color:#3bc6ff;
+    box-shadow: 0 0 0 4px rgba(59,198,255,.15), 0 0 0 1px #3bc6ff inset;
+  }
+  .actions{
+    display:flex; align-items:center; justify-content:space-between; margin-top:18px;
+  }
+  .btn{
+    padding:12px 18px; border:none; border-radius:14px;
+    color:#001018; background: linear-gradient(90deg,#45f,#f0f 45%, #0ff);
+    background-size: 200% 100%;
+    font-weight:600; cursor:pointer;
+    box-shadow: 0 10px 30px rgba(112,66,255,.35);
+    transition: transform .15s ease, background-position .6s linear;
+  }
+  .btn:hover{ transform: translateY(-1px); background-position: 100% 0; }
+  .link{ color:#7ed4ff; text-decoration:none; font-size:13px }
+  .link:hover{ text-decoration:underline }
+
+  /* small glow ring behind the card */
+  .ring{
+    position:absolute; inset:auto; width:540px; height:540px;
+    border-radius:50%;
+    background: radial-gradient(closest-side, rgba(92,255,219,.25), rgba(92,255,219,0) 70%);
+    filter: blur(40px);
+    left:50%; top:50%; translate:-50% -50%;
+    z-index:1; pointer-events:none;
+    animation:pulse 8s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{ transform: scale(1); }
+    50%{ transform: scale(1.06); }
+  }
+
+  /* footer */
+  .credit{
+    position:fixed; right:14px; bottom:10px; opacity:.7; font-size:12px; z-index:2
+  }
+</style>
+</head>
+<body>
+  <!-- SVG filter to add organic distortion (“smoke”) -->
+  <svg width="0" height="0" style="position:absolute">
+    <filter id="goo">
+      <feTurbulence type="fractalNoise" baseFrequency="0.006 0.013" numOctaves="3" seed="7">
+        <animate attributeName="baseFrequency" dur="14s" values="0.006 0.011; 0.010 0.016; 0.006 0.013" repeatCount="indefinite"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" scale="70" />
+    </filter>
+  </svg>
+
+  <div class="stage">
+    <div class="ribbon cyan"></div>
+    <div class="ribbon magenta"></div>
+    <div class="ribbon lime"></div>
+  </div>
+
+  <div class="wrap">
+    <div class="ring" aria-hidden="true"></div>
+    <form class="card" autocomplete="on">
+      <div class="title">
+        <span class="dot"></span>
+        <h1>Welcome back</h1>
+      </div>
+      <p class="sub">Sign in to continue</p>
+
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="you@example.com" required>
+
+      <label for="pwd">Password</label>
+      <input id="pwd" type="password" placeholder="12345" required>
+
+      <div class="actions">
+        <a class="link" href="#">Forgot password?</a>
+        <button class="btn" type="submit">Login</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="credit">Neon smoke background — pure CSS + SVG filter</div>
+</body>
+</html>
